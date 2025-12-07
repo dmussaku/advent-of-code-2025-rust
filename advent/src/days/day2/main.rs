@@ -14,7 +14,7 @@ pub fn read_input(path: &str) -> Vec<(String, String)>{
         .collect()
 }
 
-pub fn find_invalid_ids(start: u64, end: u64) -> Vec<u64> {
+pub fn find_invalid_ids_part1(start: u64, end: u64) -> Vec<u64> {
     let mut invalid_ids = Vec::new();
     for id in start..=end {
         let id_str = id.to_string();
@@ -38,7 +38,7 @@ pub fn run_part_1(input: Vec<(String, String)>) -> u64 {
         println!("Checking range: {}-{}", start_id, end_id);
         let start = start_id.parse::<u64>().unwrap();
         let end = end_id.parse::<u64>().unwrap();
-        let invalid_ids = find_invalid_ids(start, end);
+        let invalid_ids = find_invalid_ids_part1(start, end);
         for invalid_id in invalid_ids {
             sum += invalid_id as u64;
         }
@@ -73,8 +73,8 @@ mod tests{
     }
 
     #[test]
-    fn test_find_invalid_ids() {
-        let result = find_invalid_ids(11, 22);
+    fn test_find_invalid_ids_part1() {
+        let result = find_invalid_ids_part1(11, 22);
         assert_eq!(result, vec![11, 22]);
     }
 
