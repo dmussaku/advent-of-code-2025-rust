@@ -35,7 +35,7 @@ pub fn find_invalid_ids_part1(start: u64, end: u64) -> Vec<u64> {
 pub fn run_part_1(input: Vec<(String, String)>) -> u64 {
     let mut sum = 0;
     for (start_id, end_id) in input{
-        println!("Checking range: {}-{}", start_id, end_id);
+        // println!("Checking range: {}-{}", start_id, end_id);
         let start = start_id.parse::<u64>().unwrap();
         let end = end_id.parse::<u64>().unwrap();
         let invalid_ids = find_invalid_ids_part1(start, end);
