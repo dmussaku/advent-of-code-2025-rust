@@ -1,37 +1,40 @@
 use std::fs;
 
 
-pub fn read_input(path: &str) -> Vec<Vec<char>>{
+pub fn read_input(path: &str) -> Vec<(char, usize)>{
     let contents = fs::read_to_string(path)
         .expect("Something went wrong with a file");
     contents.lines()
-        .map(|line| line.chars().collect())
+        .map(|line| {
+            let direction = line.chars().next().unwrap();
+            let number = line[1..].parse::<usize>().unwrap();
+            (direction, number)
+        })
         .collect()
 }
 
-fn filter_input_to_have_only_digits(input: Vec<Vec<char>>) -> Vec<Vec<char>> {
-    // filter input to only include digits
-    input
-        .iter()
-        .map(|line| line
-            .iter()
-            .filter(|c| c.is_digit(10))
-            .map(|c| *c)
-            .collect()
-        )
-        .collect()    
+
+pub fn rotate(direction: &char, current_position: usize, rotate_by: usize) -> usize {
+    match direction {
+        'R' => (current_position + rotate_by) % 100,
+        'L' => (current_position as i32 - rotate_by as i32).rem_euclid(100).abs() as usize,
+        _ => current_position,
+    }
 }
 
-pub fn run_part_1(input: Vec<Vec<char>>) -> usize {
-    let filtered_input = filter_input_to_have_only_digits(input);
-    let mut sum = 0;
-    for array in filtered_input {
-        let first_elem = array.first().unwrap();
-        let last_elem = array.last().unwrap();
-        let num = format!("{}{}", first_elem, last_elem).parse::<usize>().unwrap();
-        sum += num;
+pub fn run_part_1(input: Vec<(char, usize)>) -> usize {
+    let mut final_position = 50;
+    let mut num_of_0_pos: usize = 0;
+    for (direction, number) in input{
+        // let last_position = final_position;
+        // println!("Rotating from position: {}, direction: {}, by: {}", final_position, direction, number);
+        final_position = rotate(&direction, final_position, number);
+        // println!("Rotation complete! Current position: {}, moved to: {}, by {}; result = {}", last_position, direction, number, final_position);
+        if final_position == 0 {
+            num_of_0_pos += 1;
+        }
     }
-    sum
+    num_of_0_pos
 }
 
 
@@ -43,36 +46,45 @@ mod tests{
     fn test_read_input() {
         let result = read_input("src/days/day1/input_files/test_input.txt");
         assert_eq!(result, 
-            vec![vec!['1', 'a', 'b', 'c', '2'], 
-            vec!['p', 'q', 'r', '3', 's', 't', 'u', '8', 'v', 'w', 'x'], 
-            vec!['a', '1', 'b', '2', 'c', '3', 'd', '4', 'e', '5', 'f'], 
-            vec!['t', 'r', 'e', 'b', '7', 'u', 'c', 'h', 'e', 't']]
+            vec![
+                ('L', 68),
+                ('L', 30),
+                ('R', 48),
+                ('L', 5),
+                ('R', 60),
+                ('L', 55),
+                ('L', 1),
+                ('L', 99),
+                ('R', 14),
+                ('L', 82)
+            ]
         );
     }
-
     #[test]
-    fn test_filter_input_to_have_only_digits() {
-        let input = vec![vec!['1', 'a', 'b', 'c', '2'], 
-            vec!['p', 'q', 'r', '3', 's', 't', 'u', '8', 'v', 'w', 'x'], 
-            vec!['a', '1', 'b', '2', 'c', '3', 'd', '4', 'e', '5', 'f'], 
-            vec!['t', 'r', 'e', 'b', '7', 'u', 'c', 'h', 'e', 't']];
-        let result = filter_input_to_have_only_digits(input);
-        assert_eq!(result, 
-            vec![vec!['1', '2'], 
-            vec!['3', '8'], 
-            vec!['1', '2', '3', '4', '5'], 
-            vec!['7']]
-        );
+    fn test_rotate() {
+        assert_eq!(rotate(&'R', 0, 10), 10);
+        assert_eq!(rotate(&'L', 10, 5), 5);
+        assert_eq!(rotate(&'R', 95, 10), 5);
+        assert_eq!(rotate(&'L', 5, 10), 95);
+        assert_eq!(rotate(&'L', 5, 101), 4);
     }
 
     #[test]
     fn test_run_part_1() {
-        let input = vec![vec!['1', 'a', 'b', 'c', '2'], 
-            vec!['p', 'q', 'r', '3', 's', 't', 'u', '8', 'v', 'w', 'x'], 
-            vec!['a', '1', 'b', '2', 'c', '3', 'd', '4', 'e', '5', 'f'], 
-            vec!['t', 'r', 'e', 'b', '7', 'u', 'c', 'h', 'e', 't']];
+        let input = vec![
+            ('L', 68),
+            ('L', 30),
+            ('R', 48),
+            ('L', 5),
+            ('R', 60),
+            ('L', 55),
+            ('L', 1),
+            ('L', 99),
+            ('R', 14),
+            ('L', 82)
+        ];
         let result = run_part_1(input);
-        assert_eq!(result, 142);
+        assert_eq!(result, 3);
     }
 }
 
